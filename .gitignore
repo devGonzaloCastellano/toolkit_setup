@@ -1,0 +1,24 @@
+# ============================================================
+# Windows Setup Toolkit - .gitignore
+# ============================================================
+
+# Logs generados en ejecucion
+logs/
+
+# Instaladores y binarios offline
+# Estos archivos van en el pendrive, no en el repositorio.
+# Se documentan en README cuales se necesitan y de donde obtenerlos.
+instaladores/runtimes/
+instaladores/office/
+instaladores/drivers/
+
+# Archivos temporales de Windows
+Thumbs.db
+desktop.ini
+
+# Archivos temporales de editores
+*.swp
+*.bak
+*~
+.vscode/
+.idea/
