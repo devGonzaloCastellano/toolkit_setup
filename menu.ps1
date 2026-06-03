@@ -62,23 +62,27 @@ function Show-Header {
 function Show-Menu {
     Show-Header
 
+    Write-Host "   -- AUDITORIA --"              -ForegroundColor DarkCyan
+    Write-Host "    [1]  Auditoria del sistema"
+    Write-Host ""
+
     Write-Host "   -- SETUP RAPIDO --"              -ForegroundColor DarkCyan
-    Write-Host "    [1]  Setup completo (elegir perfil)"
+    Write-Host "    [2]  Setup completo (elegir perfil)"
     Write-Host ""
 
     Write-Host "   -- POR CATEGORIA --"             -ForegroundColor DarkCyan
-    Write-Host "    [2]  Runtimes y redistribuibles"
-    Write-Host "    [3]  Navegadores"
-    Write-Host "    [4]  Compresores"
-    Write-Host "    [5]  Multimedia"
-    Write-Host "    [6]  Productividad y Office"
-    Write-Host "    [7]  Comunicacion"
-    Write-Host "    [8]  Developer"
-    Write-Host "    [9]  Drivers"
+    Write-Host "    [3]  Runtimes y redistribuibles"
+    Write-Host "    [4]  Navegadores"
+    Write-Host "    [5]  Compresores"
+    Write-Host "    [6]  Multimedia"
+    Write-Host "    [7]  Productividad y Office"
+    Write-Host "    [8]  Comunicacion"
+    Write-Host "    [9]  Developer"
+    Write-Host "    [10]  Drivers"
     Write-Host ""
 
     Write-Host "   -- WINDOWS --"                   -ForegroundColor DarkCyan
-    Write-Host "   [10]  Configuraciones iniciales de Windows"
+    Write-Host "   [11]  Configuraciones iniciales de Windows"
     Write-Host ""
 
     Write-Host "  ==================================================" -ForegroundColor Cyan
@@ -109,16 +113,17 @@ function Invoke-Module {
 #region TABLA DE MODULOS
 
 $ModuleMap = @{
-    "1"  = "setup_completo.ps1"
-    "2"  = "runtimes.ps1"
-    "3"  = "navegadores.ps1"
-    "4"  = "compresores.ps1"
-    "5"  = "multimedia.ps1"
-    "6"  = "productividad.ps1"
-    "7"  = "comunicacion.ps1"
-    "8"  = "developer.ps1"
-    "9"  = "drivers.ps1"
-    "10" = "configurar.ps1"
+    "1"  = "system_audit.ps1"
+    "2"  = "setup_completo.ps1"
+    "3"  = "runtimes.ps1"
+    "4"  = "navegadores.ps1"
+    "5"  = "compresores.ps1"
+    "6"  = "multimedia.ps1"
+    "7"  = "productividad.ps1"
+    "8"  = "comunicacion.ps1"
+    "9"  = "developer.ps1"
+    "10" = "drivers.ps1"
+    "11" = "configurar.ps1"
 }
 
 #endregion
