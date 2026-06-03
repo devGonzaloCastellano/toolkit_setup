@@ -305,3 +305,37 @@ function Test-DiskSpace {
 }
 
 #endregion
+
+<#
+.SYNOPSIS
+    Determina el estado de instalacion de un paquete winget.
+.PARAMETER PackageId
+    ID del paquete winget. Ejemplo: "Google.Chrome"
+.OUTPUTS
+    [string] INSTALLED | OUTDATED | MISSING | UNKNOWN
+.EXAMPLE
+    $estado = Get-WingetPackageStatus -PackageId "Google.Chrome"
+#>
+function Get-WingetPackageStatus {
+    param(
+        [Parameter(Mandatory)]
+        [string]$PackageId
+    )
+
+    $resultado = winget list --id $PackageId --exact 2>&1
+
+    if ($LASTEXITCODE -ne 0) { return "UNKNOWN" }
+
+    # Si no aparece en la lista, no esta instalado
+    if ($resultado -notmatch [regex]::Escape($PackageId)) { return "MISSING" }
+
+    # Si aparece y tiene una columna "Disponible", hay actualizacion pendiente
+    if ($resultado -match "^\S.*\s+\S+\s+\S+\s+\S+") {
+        # winget list muestra columna "Disponible" solo cuando hay update
+        $linea = ($resultado | Where-Object { $_ -match [regex]::Escape($PackageId) })
+        $columnas = $linea -split '\s{2,}'
+        if ($columnas.Count -ge 4) { return "OUTDATED" }
+    }
+
+    return "INSTALLED"
+}
