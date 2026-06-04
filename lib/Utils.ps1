@@ -322,19 +322,34 @@ function Get-WingetPackageStatus {
         [string]$PackageId
     )
 
-    $resultado = winget list --id $PackageId --exact 2>&1
+    try {
+        $resultado = winget list --id $PackageId --exact --accept-source-agreements 2>&1
+    } catch {
+        return "UNKNOWN"
+    }
 
-    if ($LASTEXITCODE -ne 0) { return "UNKNOWN" }
+    if ($LASTEXITCODE -ne 0) {
+        if ($LASTEXITCODE -eq 1 -or $LASTEXITCODE -eq -1978335212) { return "MISSING" }
+        return "UNKNOWN"
+    }
 
-    # Si no aparece en la lista, no esta instalado
-    if ($resultado -notmatch [regex]::Escape($PackageId)) { return "MISSING" }
+    $texto = $resultado -join " "
+    if ($texto -notmatch [regex]::Escape($PackageId)) { return "MISSING" }
 
-    # Si aparece y tiene una columna "Disponible", hay actualizacion pendiente
-    if ($resultado -match "^\S.*\s+\S+\s+\S+\s+\S+") {
-        # winget list muestra columna "Disponible" solo cuando hay update
-        $linea = ($resultado | Where-Object { $_ -match [regex]::Escape($PackageId) })
-        $columnas = $linea -split '\s{2,}'
-        if ($columnas.Count -ge 4) { return "OUTDATED" }
+    # Buscar el indice de la columna "Disponible" en el header
+    $headerLine = $resultado | Where-Object { $_ -match "^Nombre\s+Id\s+" }
+    if (-not $headerLine) { return "INSTALLED" }
+
+    $disponibleIndex = $headerLine.IndexOf("Disponible")
+    if ($disponibleIndex -lt 0) { return "INSTALLED" }
+
+    # Verificar si alguna linea del paquete tiene contenido en esa posicion
+    $lineas = $resultado | Where-Object { $_ -match [regex]::Escape($PackageId) }
+    foreach ($linea in $lineas) {
+        if ($linea.Length -gt $disponibleIndex) {
+            $valor = $linea.Substring($disponibleIndex).Trim()
+            if ($valor -and $valor -notmatch "^\s*$") { return "OUTDATED" }
+        }
     }
 
     return "INSTALLED"
