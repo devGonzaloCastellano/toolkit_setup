@@ -77,12 +77,11 @@ function Show-Menu {
     Write-Host "    [6]  Multimedia"
     Write-Host "    [7]  Productividad y Office"
     Write-Host "    [8]  Comunicacion"
-    Write-Host "    [9]  Developer"
-    Write-Host "    [10]  Drivers"
+    Write-Host "    [9]  Drivers"
     Write-Host ""
 
     Write-Host "   -- WINDOWS --"                   -ForegroundColor DarkCyan
-    Write-Host "   [11]  Configuraciones iniciales de Windows"
+    Write-Host "   [10]  Configuraciones iniciales de Windows"
     Write-Host ""
 
     Write-Host "  ==================================================" -ForegroundColor Cyan
@@ -121,9 +120,8 @@ $ModuleMap = @{
     "6"  = "multimedia.ps1"
     "7"  = "productividad.ps1"
     "8"  = "comunicacion.ps1"
-    "9"  = "developer.ps1"
-    "10" = "drivers.ps1"
-    "11" = "configurar.ps1"
+    "9"  = "drivers.ps1"
+    "10" = "configurar.ps1"
 }
 
 #endregion
