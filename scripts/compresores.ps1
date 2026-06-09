@@ -7,7 +7,7 @@
     Permite instalar multiples compresores en secuencia antes de finalizar.
     Genera un reporte con el estado previo y final de cada componente.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 #>
 
@@ -116,12 +116,9 @@ function Invoke-Auditoria {
             "UNKNOWN"   { "{0} (UNKNOWN)"           -f $comp.Nombre }
         }
 
-        switch ($comp.Estado) {
-            "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-            "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-            "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-            "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-        }
+        $tag   = Get-CenteredTag -Text $comp.Estado -TotalWidth 11
+        $level = if ($comp.Estado -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+        Write-Log "$tag $label" -Level $level -LogFile $LogFile
     }
 
     Write-Blank -LogFile $LogFile
@@ -137,24 +134,28 @@ function Show-Submenu {
 
     $opciones = @{}
     $contador = 1
+    $tagOK = Get-CenteredTag -Text "OK" -TotalWidth 2
 
     foreach ($comp in $compresores) {
         switch ($comp.Estado) {
             "INSTALLED" {
-                Write-Host ("   [OK] {0,-10} INSTALLED - {1}" -f $comp.Nombre, $comp.Version) -ForegroundColor Green
+                Write-Host ("   $tagOK {0,-10} INSTALLED - {1}" -f $comp.Nombre, $comp.Version) -ForegroundColor Green
             }
             "OUTDATED" {
-                Write-Host ("   [{0}] {1,-10} OUTDATED  - {2}" -f $contador, $comp.Nombre, $comp.Version) -ForegroundColor Yellow
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-10} OUTDATED  - {1}" -f $comp.Nombre, $comp.Version) -ForegroundColor Yellow
                 $opciones[$contador.ToString()] = $comp
                 $contador++
             }
             "MISSING" {
-                Write-Host ("   [{0}] {1,-10} MISSING" -f $contador, $comp.Nombre) -ForegroundColor Gray
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-10} MISSING" -f $comp.Nombre) -ForegroundColor Gray
                 $opciones[$contador.ToString()] = $comp
                 $contador++
             }
             "UNKNOWN" {
-                Write-Host ("   [{0}] {1,-10} UNKNOWN" -f $contador, $comp.Nombre) -ForegroundColor DarkYellow
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-10} UNKNOWN" -f $comp.Nombre) -ForegroundColor DarkYellow
                 $opciones[$contador.ToString()] = $comp
                 $contador++
             }
@@ -280,12 +281,9 @@ foreach ($comp in $compresores) {
         "UNKNOWN"   { "{0} (UNKNOWN)"           -f $comp.Nombre }
     }
 
-    switch ($estadoFinal) {
-        "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-        "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-        "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-        "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-    }
+    $tag   = Get-CenteredTag -Text $estadoFinal -TotalWidth 11
+    $level = if ($estadoFinal -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+    Write-Log "$tag $label" -Level $level -LogFile $LogFile
 }
 
 Write-Blank -LogFile $LogFile
@@ -298,7 +296,8 @@ if ($acciones.Count -eq 0) {
     Write-Log "No se realizaron cambios." -LogFile $LogFile
 } else {
     foreach ($r in $acciones) {
-        $linea = "  [{0,-8}] {1} (era: {2})" -f $r.Final, $r.Nombre, $r.Previo
+        $tag   = Get-CenteredTag -Text $r.Final -TotalWidth 7
+        $linea = "  $tag $($r.Nombre) (era: $($r.Previo))"
         switch ($r.Final) {
             "OK"    { Write-Log $linea -Level SUCCESS -LogFile $LogFile }
             "ERROR" { Write-Log $linea -Level ERROR   -LogFile $LogFile }
