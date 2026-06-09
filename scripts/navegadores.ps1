@@ -7,7 +7,7 @@
     Permite instalar multiples navegadores en secuencia antes de finalizar.
     Genera un reporte con el estado previo y final de cada componente.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 #>
 
@@ -105,40 +105,33 @@ function Invoke-Auditoria {
     Write-Log "Verificando estado de navegadores instalados..." -LogFile $LogFile
     Write-Blank -LogFile $LogFile
 
-    # Edge primero como informativo
-    Write-Log "[INSTALLED] Edge (INSTALLED - $($edge.Version)) [informativo]" -Level SUCCESS -LogFile $LogFile
+    $tagInstalado = Get-CenteredTag -Text "INSTALLED" -TotalWidth 11
+    Write-Log "$tagInstalado Edge (INSTALLED) - $($edge.Version) [informativo]" -Level SUCCESS -LogFile $LogFile
 
     foreach ($nav in $navegadores) {
         $nav.Estado = Get-WingetPackageStatus -PackageId $nav.Id
 
-        # Si no se encontro por ID principal, probar ID alternativo
         if ($nav.Estado -eq "MISSING" -and $nav.IdAlt -ne "") {
             $estadoAlt = Get-WingetPackageStatus -PackageId $nav.IdAlt
-            if ($estadoAlt -ne "MISSING") {
-                $nav.Estado = $estadoAlt
-            }
+            if ($estadoAlt -ne "MISSING") { $nav.Estado = $estadoAlt }
         }
 
         $nav.Version = if ($nav.Estado -ne "MISSING") { Get-VersionInstalada -PackageId $nav.Id } else { "" }
 
-        # Si la version no se obtuvo por ID principal, intentar con IdAlt
         if ($nav.Version -eq "" -and $nav.IdAlt -ne "") {
             $nav.Version = Get-VersionInstalada -PackageId $nav.IdAlt
         }
 
         $label = switch ($nav.Estado) {
-            "INSTALLED" { "{0} (INSTALLED - {1})" -f $nav.Nombre, $nav.Version }
-            "OUTDATED"  { "{0} (OUTDATED  - {1})" -f $nav.Nombre, $nav.Version }
-            "MISSING"   { "{0} (MISSING)"          -f $nav.Nombre }
-            "UNKNOWN"   { "{0} (UNKNOWN)"           -f $nav.Nombre }
+            "INSTALLED" { "{0} (INSTALLED) - {1}" -f $nav.Nombre, $nav.Version }
+            "OUTDATED"  { "{0} (OUTDATED) - {1}"  -f $nav.Nombre, $nav.Version }
+            "MISSING"   { "{0} (MISSING)"         -f $nav.Nombre }
+            "UNKNOWN"   { "{0} (UNKNOWN)"         -f $nav.Nombre }
         }
 
-        switch ($nav.Estado) {
-            "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-            "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-            "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-            "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-        }
+        $tag   = Get-CenteredTag -Text $nav.Estado -TotalWidth 11
+        $level = if ($nav.Estado -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+        Write-Log "$tag $label" -Level $level -LogFile $LogFile
     }
 
     Write-Blank -LogFile $LogFile
@@ -155,26 +148,29 @@ function Show-Submenu {
     $opciones = @{}
     $contador = 1
 
-    # Edge siempre como informativo
-    Write-Host ("   [OK] {0,-10} INSTALLED - {1} [sistema]" -f $edge.Nombre, $edge.Version) -ForegroundColor DarkGreen
+    $tagOK = Get-CenteredTag -Text "OK" -TotalWidth 2
+    Write-Host ("   $tagOK {0,-10} INSTALLED - {1} [sistema]" -f $edge.Nombre, $edge.Version) -ForegroundColor Green
 
     foreach ($nav in $navegadores) {
         switch ($nav.Estado) {
             "INSTALLED" {
-                Write-Host ("   [OK] {0,-10} INSTALLED - {1}" -f $nav.Nombre, $nav.Version) -ForegroundColor Green
+                Write-Host ("   $tagOK {0,-10} INSTALLED - {1}" -f $nav.Nombre, $nav.Version) -ForegroundColor Green
             }
             "OUTDATED" {
-                Write-Host ("   [{0}] {1,-10} OUTDATED  - {2}" -f $contador, $nav.Nombre, $nav.Version) -ForegroundColor Yellow
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-10} OUTDATED  - {1}" -f $nav.Nombre, $nav.Version) -ForegroundColor Yellow
                 $opciones[$contador.ToString()] = $nav
                 $contador++
             }
             "MISSING" {
-                Write-Host ("   [{0}] {1,-10} MISSING" -f $contador, $nav.Nombre) -ForegroundColor Gray
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-10} MISSING" -f $nav.Nombre) -ForegroundColor Gray
                 $opciones[$contador.ToString()] = $nav
                 $contador++
             }
             "UNKNOWN" {
-                Write-Host ("   [{0}] {1,-10} UNKNOWN" -f $contador, $nav.Nombre) -ForegroundColor DarkYellow
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-10} UNKNOWN" -f $nav.Nombre) -ForegroundColor DarkYellow
                 $opciones[$contador.ToString()] = $nav
                 $contador++
             }
@@ -202,7 +198,29 @@ function Invoke-InstalarNavegador {
         }
     }
 
-    $accion = if ($Navegador.Estado -eq "OUTDATED") { "upgrade" } else { "install" }
+    # Si fue detectado via IdAlt y esta desactualizado, consultar al tecnico
+    $forzarReinstalar = $false
+    if ($idEfectivo -eq $Navegador.IdAlt -and $Navegador.Estado -eq "OUTDATED") {
+        Write-Blank -LogFile $LogFile
+        Write-Log "$($Navegador.Nombre) fue detectado fuera del registro de winget." -Level WARNING -LogFile $LogFile
+        Write-Host ""
+        Write-Host "   [1] Actualizar version existente (conserva perfil del usuario)" -ForegroundColor Cyan
+        Write-Host "   [2] Reinstalar limpiamente via winget (puede afectar el perfil)" -ForegroundColor Yellow
+        Write-Host "   [0] Cancelar" -ForegroundColor DarkGray
+        Write-Host ""
+        $opcion = Read-Host "   Elegir opcion"
+
+        switch ($opcion) {
+            "1" { $forzarReinstalar = $false }
+            "2" { $forzarReinstalar = $true  }
+            default {
+                Write-Log "Operacion cancelada: $($Navegador.Nombre)" -Level WARNING -LogFile $LogFile
+                return $false
+            }
+        }
+    }
+
+    $accion = if ($Navegador.Estado -eq "OUTDATED" -and -not $forzarReinstalar) { "upgrade" } else { "install" }
     $verbo  = if ($accion -eq "upgrade") { "Actualizando" } else { "Instalando" }
 
     Write-Blank -LogFile $LogFile
@@ -310,10 +328,9 @@ Write-Blank -LogFile $LogFile
 foreach ($nav in $navegadores) {
     $estadoFinal = Get-WingetPackageStatus -PackageId $nav.Id
 
-    # Fallback a IdAlt si el principal no lo encuentra
     if ($estadoFinal -eq "MISSING" -and $nav.IdAlt -ne "") {
         $estadoAlt = Get-WingetPackageStatus -PackageId $nav.IdAlt
-    if ($estadoAlt -ne "MISSING") { $estadoFinal = $estadoAlt }
+        if ($estadoAlt -ne "MISSING") { $estadoFinal = $estadoAlt }
     }
 
     $version = if ($estadoFinal -ne "MISSING") { Get-VersionInstalada -PackageId $nav.Id } else { "" }
@@ -321,20 +338,16 @@ foreach ($nav in $navegadores) {
         $version = Get-VersionInstalada -PackageId $nav.IdAlt
     }
 
-
     $label = switch ($estadoFinal) {
-        "INSTALLED" { "{0} (INSTALLED - {1})" -f $nav.Nombre, $version }
-        "OUTDATED"  { "{0} (OUTDATED  - {1})" -f $nav.Nombre, $version }
-        "MISSING"   { "{0} (MISSING)"          -f $nav.Nombre }
-        "UNKNOWN"   { "{0} (UNKNOWN)"           -f $nav.Nombre }
+        "INSTALLED" { "{0} (INSTALLED) - {1}" -f $nav.Nombre, $version }
+        "OUTDATED"  { "{0} (OUTDATED) - {1}"  -f $nav.Nombre, $version }
+        "MISSING"   { "{0} (MISSING)"         -f $nav.Nombre }
+        "UNKNOWN"   { "{0} (UNKNOWN)"         -f $nav.Nombre }
     }
 
-    switch ($estadoFinal) {
-        "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-        "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-        "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-        "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-    }
+    $tag   = Get-CenteredTag -Text $estadoFinal -TotalWidth 11
+    $level = if ($estadoFinal -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+    Write-Log "$tag $label" -Level $level -LogFile $LogFile
 }
 
 Write-Blank -LogFile $LogFile
@@ -348,7 +361,8 @@ if ($ok.Count -eq 0 -and $errores.Count -eq 0) {
     Write-Log "No se realizaron cambios." -LogFile $LogFile
 } else {
     foreach ($r in $resultados | Where-Object { $_.Previo -ne "INSTALLED" }) {
-        $linea = "  [{0,-8}] {1} (era: {2})" -f $r.Final, $r.Nombre, $r.Previo
+        $tag   = Get-CenteredTag -Text $r.Final -TotalWidth 7
+        $linea = "  $tag $($r.Nombre) (Antes: $($r.Previo))"
         switch ($r.Final) {
             "OK"    { Write-Log $linea -Level SUCCESS -LogFile $LogFile }
             "ERROR" { Write-Log $linea -Level ERROR   -LogFile $LogFile }
