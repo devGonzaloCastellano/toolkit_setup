@@ -19,27 +19,32 @@ de mantenimiento posteriores.
 ### 1. Distinción entre CANCELLED y ERROR en reporte de acciones
 
 **Detectado en:** navegadores.ps1
-**Verificar en:** todos los módulos con loop de selección
+
+**Aplica en:** todos los módulos con loop de selección
 
 **Problema:**
-Cuando el técnico cancela una operación desde el prompt (por ejemplo el
-prompt de IdAlt en Chrome), `Invoke-InstalarNavegador` retorna `$false`.
-El loop de selección interpreta ese `$false` como ERROR y lo registra
+Cuando el técnico cancela una operación, la función `Invoke-Instalar*` retorna `$false`.
+El loop de selección interpreta ese `$false` como ERROR y lo registra 
 como tal en el reporte de acciones realizadas.
 
 El reporte muestra `[ ERROR ]` para una operación que fue cancelada
 deliberadamente, lo cual puede generar confusion al leer el log.
 
+Si bien de momento solo el modúlo navegadores.ps1 tiene un prompt explicito de cancelación,
+todos los módulos son susceptibles al mismo problema en cuanto se agreguen prompts similares.
+El patrón se repite en todos.
+
 **Solución propuesta:**
-Agregar un tercer valor de retorno o un estado `CANCELLED` al objeto
-de resultados. Actualizar el loop de selección, el reporte final y
-la lógica de filtrado para distinguir los tres casos: OK, ERROR, CANCELLED.
+Abstraer el manejo de resultados en una función centralizada en
+un nuevo modúlo que distinga tres estados: `OK, ERROR, CANCELLED`.
+Actualizar el loop de selección y el reporte final en cada modúlo
+para consumir esa función en lugar de manejar el retorno directamente.
 
-**Impacto estimado:** bajo — afecta el loop de selección y el bloque
-de reporte final en cada modúlo que tenga prompt de cancelación.
+**Impacto estimado:** medio — afecta el loop de selección y el bloque
+de reporte final en todos los módulos, más la creación de la función
+centralizada en un nuevo modúlo.
 
-**Destino:** a evaluar en v2.0.0 o version de mantenimiento v1.2.0
-según la cantidad de módulos afectados.
+**Destino:** v2.0.0 
 
 ---
 
@@ -49,7 +54,7 @@ según la cantidad de módulos afectados.
 |--------------------|---------------------|
 | Utils.ps1          | ✓                   |
 | navegadores.ps1    | ✓                   |
-| compresores.ps1    | pendiente           |
+| compresores.ps1    | ✓                   |
 | multimedia.ps1     | pendiente           |
 | productividad.ps1  | pendiente           |
 | comunicacion.ps1   | pendiente           |
