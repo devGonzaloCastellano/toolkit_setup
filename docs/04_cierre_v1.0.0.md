@@ -8,24 +8,24 @@ v1.0.0 completada y funcional.
 
 ---
 
-## Modulos implementados
+## Módulos implementados
 
-| Modulo             | Estado      | Notas                                      |
-|--------------------|-------------|--------------------------------------------|
-| launcher.bat       | Completo    |                                            |
-| menu.ps1           | Completo    |                                            |
-| lib/Utils.ps1      | Completo    |                                            |
-| system_audit.ps1   | Completo    | Auditoria global de software y hardware    |
-| runtimes.ps1       | Completo    |                                            |
-| navegadores.ps1    | Completo    |                                            |
-| compresores.ps1    | Completo    |                                            |
-| multimedia.ps1     | Completo    |                                            |
-| comunicación.ps1   | Completo    |                                            |
-| productividad.ps1  | Completo    | Incluye tres caminos de Office             |
-| drivers.ps1        | Completo    | Lanzador de SDIO                           |
-| configurar.ps1     | Completo    | Configuraciones iniciales de Windows       |
-| setup_completo.ps1 | Completo    | Presets: Hogar, Oficina, Creativo          |
-| developer.ps1      | Eliminado   | Fuera de scope, ver decision mas abajo     |
+| Modulo             | Estado      | Notas                                   |
+|--------------------|-------------|-----------------------------------------|
+| launcher.bat       | Completo    |                                         |
+| menu.ps1           | Completo    |                                         |
+| lib/Utils.ps1      | Completo    |                                         |
+| system_audit.ps1   | Completo    | Auditoria global de software y hardware |
+| runtimes.ps1       | Completo    |                                         |
+| navegadores.ps1    | Completo    |                                         |
+| compresores.ps1    | Completo    |                                         |
+| multimedia.ps1     | Completo    |                                         |
+| comunicación.ps1   | Completo    |                                         |
+| productividad.ps1  | Completo    | Incluye tres caminos de Office          |
+| drivers.ps1        | Completo    | Lanzador de SDIO                        |
+| configurar.ps1     | Completo    | Configuraciones iniciales de Windows    |
+| setup_completo.ps1 | Completo    | Presets: Hogar, Oficina, Creativo       |
+| developer.ps1      | Eliminado   | Fuera de scope, ver decision más abajo  |
 
 ---
 

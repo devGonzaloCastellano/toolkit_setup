@@ -134,7 +134,7 @@ La instalación pasa a ser una acción derivada del diagnóstico previo.
 
 ## Situación detectada
 
-Actualmente solo existe una condición implícita:
+Actualmente, solo existe una condición implícita:
 
 - Instalar
 
@@ -154,7 +154,7 @@ El componente no está instalado.
 
 ### OUTDATED
 
-Existe una versión instalada pero no es la recomendada.
+Existe una versión instalada, pero no es la recomendada.
 
 ### UNKNOWN
 

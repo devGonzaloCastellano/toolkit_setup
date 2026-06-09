@@ -1,25 +1,25 @@
-# Windows Setup Toolkit - Planificacion v1.1.0
+# Windows Setup Toolkit - Planificación v1.1.0
 
 ## Historial de versiones del plan
 
-| Version | Fecha      | Descripcion                                      |
+| Version | Fecha      | Descripción                                      |
 |---------|------------|--------------------------------------------------|
 | v1.0.0  | 2026-05-xx | Plan inicial                                     |
-| v1.1.0  | 2026-06-02 | Revision arquitectonica post hallazgos iniciales |
+| v1.1.0  | 2026-06-02 | Revision arquitectónica post hallazgos iniciales |
 
 ---
 
 ## Vision general
 
-Toolkit portable desarrollada en PowerShell para la configuracion inicial
+Toolkit portable desarrollada en PowerShell para la configuración inicial
 y mantenimiento de equipos Windows.
 
-La toolkit no asume estado cero. Puede ejecutarse sobre equipos recien
+La toolkit no asume estado cero. Puede ejecutarse sobre equipos recién
 formateados, equipos parcialmente configurados o equipos de clientes con
 software preexistente.
 
-Su funcion principal es auditar el estado del sistema, determinar que
-falta o esta desactualizado, y ejecutar las acciones necesarias con
+Su función principal es auditar el estado del sistema, determinar que
+falta o está desactualizado, y ejecutar las acciones necesarias con
 evidencia registrada.
 
 Complementa la Portable Windows Toolkit dentro de un ecosistema de
@@ -40,18 +40,18 @@ Ecosistema (futuro)
 
 ---
 
-## Cambio de enfoque arquitectonico (v1.1.0)
+## Cambio de enfoque arquitectónico (v1.1.0)
 
-### Diseno original (v1.0.0)
+### Diseño original (v1.0.0)
 La toolkit instala software post-formato.
 
-### Diseno actualizado (v1.1.0)
+### Diseño actualizado (v1.1.0)
 La toolkit audita el sistema, determina necesidades y ejecuta
-instalaciones, actualizaciones o configuraciones segun corresponda.
+instalaciones, actualizaciones o configuraciones según corresponda.
 
-La instalacion pasa a ser una accion derivada del diagnostico previo.
+La instalación pasa a ser una acción derivada del diágnostico previo.
 
-### Flujo general por modulo
+### Flujo general por modúlo
 ```
 [ Auditoria del modulo ]
          |
@@ -73,12 +73,12 @@ La instalacion pasa a ser una accion derivada del diagnostico previo.
 
 ## Entorno de pruebas
 
-El desarrollo se valida sobre maquinas virtuales en VirtualBox:
+El desarrollo se valida sobre máquinas virtuales en VirtualBox:
 - Windows 10 (VM dedicada)
 - Windows 11 (VM dedicada)
 
-Razon: el equipo de desarrollo tiene software preexistente que impide
-validar el comportamiento real de los modulos de instalacion.
+Razón: el equipo de desarrollo tiene software preexistente que impide
+validar el comportamiento real de los módulos de instalación.
 Las VMs proveen un entorno limpio y reproducible para cada prueba.
 
 ---
@@ -87,19 +87,19 @@ Las VMs proveen un entorno limpio y reproducible para cada prueba.
 
 ### Estados v1.x
 
-| Estado    | Descripcion                                              |
-|-----------|----------------------------------------------------------|
-| INSTALLED | Componente presente y en version recomendada             |
-| MISSING   | Componente no instalado                                  |
-| OUTDATED  | Version instalada inferior a la recomendada              |
-| UNKNOWN   | No fue posible determinar el estado con certeza          |
+| Estado    | Descripción                                     |
+|-----------|-------------------------------------------------|
+| INSTALLED | Componente presente y en version recomendada    |
+| MISSING   | Componente no instalado                         |
+| OUTDATED  | Version instalada inferior a la recomendada     |
+| UNKNOWN   | No fue posible determinar el estado con certeza |
 
 ### Estados futuros (v2.x)
 
-| Estado     | Descripcion                                             |
-|------------|---------------------------------------------------------|
-| CORRUPTED  | Instalacion danada o incompleta                         |
-| REPAIRABLE | Instalacion valida que requiere reparacion              |
+| Estado     | Descripción                                |
+|------------|--------------------------------------------|
+| CORRUPTED  | Instalación dañada o incompleta            |
+| REPAIRABLE | Instalación valida que requiere reparación |
 
 ---
 
@@ -107,21 +107,21 @@ Las VMs proveen un entorno limpio y reproducible para cada prueba.
 
 ### Incluido
 - Auditoria global del sistema (system_audit.ps1)
-- Instalacion de software via winget (seleccion interactiva por categoria)
+- Instalación de software via winget (selección interactiva por categoría)
 - Presets de perfil como punto de partida (Hogar, Oficina, Developer)
 - Runtimes y redistribuibles offline (Visual C++, .NET, DirectX)
-- Drivers via SDIO para deteccion automatica
+- Drivers via SDIO para detección automática
 - Tres caminos para Office (Microsoft 365, ODT offline, LibreOffice)
-- Configuraciones iniciales de Windows (privacidad, energia, actualizaciones)
+- Configuraciones iniciales de Windows (privacidad, energía, actualizaciones)
 - Sistema de logs con mismo formato que Portable Windows Toolkit
-- Mini reporte por modulo al finalizar cada instalacion
-- Reporte global exportable (pre y post implementacion)
+- Mini reporte por modúlo al finalizar cada instalación
+- Reporte global exportable (pre y post implementación)
 
 ### Fuera de scope v1.0.0
-- Instalacion desatendida de Windows (toolkit separada futura)
+- Instalación desatendida de Windows (toolkit separada futura)
 - Activaciones de software no licenciadas
 - Drivers de GPU (demasiado variables, se delega al cliente)
-- Impresoras y perifericos especificos por cliente
+- Impresoras y periféricos específicos por cliente
 - Estados CORRUPTED / REPAIRABLE (v2.x)
 
 ---
@@ -185,8 +185,8 @@ windows-setup-toolkit/
 ==========================================
 ```
 
-Razon del orden: la auditoria es la primera accion que realiza el
-tecnico al llegar a un equipo. Debe estar en la opcion mas accesible
+Razón del orden: la auditoria es la primera acción que realiza el
+técnico al llegar a un equipo. Debe estar en la opción más accesible
 del menu y ser el punto de partida natural del flujo de trabajo.
 
 ---
@@ -198,23 +198,23 @@ del menu y ser el punto de partida natural del flujo de trabajo.
 Modulo de auditoria global. No instala nada.
 
 Responsabilidades:
-- Recorrer el catalogo completo de componentes de todos los modulos
+- Recorrer el catálogo completo de componentes de todos los módulos
 - Determinar el estado de cada componente (INSTALLED/MISSING/OUTDATED/UNKNOWN)
 - Mostrar reporte en consola con colores por estado
 - Exportar reporte a archivo en /logs
 
 Casos de uso:
-1. Pre-implementacion: el tecnico audita antes de trabajar para ver
+1. Pre-implementación: el técnico audita antes de trabajar para ver
    que necesita el equipo
-2. Post-implementacion: el tecnico audita al finalizar para verificar
+2. Post-implementación: el técnico audita al finalizar para verificar
    que todo quedo correctamente instalado y generar evidencia
 
 ### Auditoria por modulo
 
-Cada modulo de instalacion (runtimes.ps1, navegadores.ps1, etc.)
+Cada modulo de instalación (runtimes.ps1, navegadores.ps1, etc.)
 realiza su propia auditoria antes de actuar:
 
-- Consulta el estado de sus componentes especificos
+- Consulta el estado de sus componentes específicos
 - Omite los INSTALLED
 - Informa los OUTDATED y pregunta si actualizar
 - Instala los MISSING
@@ -224,7 +224,7 @@ Al finalizar genera un mini reporte con el resultado de cada componente.
 
 ### Get-WingetPackageStatus (Utils.ps1)
 
-Funcion compartida que todos los modulos usan para auditar.
+Función compartida que todos los módulos usan para auditar.
 Recibe un package ID de winget y devuelve el estado del componente.
 
 ```
@@ -238,15 +238,15 @@ Get-WingetPackageStatus -PackageId "Google.Chrome"
 
 ### Runtimes y redistribuibles (siempre, sin pregunta)
 
-| Componente                        | Arquitectura | Razon                                    |
-|-----------------------------------|--------------|------------------------------------------|
-| Visual C++ Redistributable 2015-2022 | x64 + x86 | Dependencia de casi toda aplicacion moderna |
-| Visual C++ Redistributable 2013   | x64 + x86    | Aplicaciones y juegos legacy             |
-| Visual C++ Redistributable 2010   | x64 + x86    | Software industrial y legacy             |
-| .NET Runtime 6 LTS                | x64          | Aplicaciones modernas                    |
-| .NET Runtime 8 LTS                | x64          | Aplicaciones modernas                    |
-| .NET Framework 3.5                | -            | Aplicaciones y juegos viejos             |
-| DirectX End-User Runtime          | -            | Juegos y aplicaciones multimedia legacy  |
+| Componente                           | Arquitectura  | Razón                                       |
+|--------------------------------------|---------------|---------------------------------------------|
+| Visual C++ Redistributable 2015-2022 | x64 + x86     | Dependencia de casi toda aplicación moderna |
+| Visual C++ Redistributable 2013      | x64 + x86     | Aplicaciones y juegos legacy                |
+| Visual C++ Redistributable 2010      | x64 + x86     | Software industrial y legacy                |
+| .NET Runtime 6 LTS                   | x64           | Aplicaciones modernas                       |
+| .NET Runtime 8 LTS                   | x64           | Aplicaciones modernas                       |
+| .NET Framework 3.5                   | -             | Aplicaciones y juegos viejos                |
+| DirectX End-User Runtime             | -             | Juegos y aplicaciones multimedia legacy     |
 
 Nota sobre arquitectura: Windows 10/11 es 64 bits en la gran mayoria
 de los equipos actuales. Se incluye x86 solo en Visual C++ porque
@@ -257,53 +257,53 @@ la version x86 del runtime igual.
 
 ### Navegadores
 
-| Programa | Pros                                                        | Contras                              | Default |
-|----------|-------------------------------------------------------------|--------------------------------------|---------|
-| Chrome   | Estandar de facto, compatibilidad maxima, sincronizacion Google | Alto consumo RAM/CPU, telemetria | Si      |
-| Brave    | Motor Chromium, bajo consumo, bloqueador nativo, sin telemetria | Menos conocido para no tecnicos  | Si      |
-| Firefox  | Independiente de Chromium, privacidad, bajo consumo        | Menor compatibilidad corporativa     | Opcional|
-| Edge     | Ya instalado en Windows                                     | Telemetria Microsoft agresiva        | No tocar|
+| Programa | Pros                                                            | Contras                          | Default  |
+|----------|-----------------------------------------------------------------|----------------------------------|----------|
+| Chrome   | Estándar de facto, compatibilidad maxima, sincronización Google | Alto consumo RAM/CPU, telemetría | Si       |
+| Brave    | Motor Chromium, bajo consumo, bloqueador nativo, sin telemetría | Menos conocido para no técnicos  | Si       |
+| Firefox  | Independiente de Chromium, privacidad, bajo consumo             | Menor compatibilidad corporativa | Opcional |
+| Edge     | Ya instalado en Windows                                         | Telemetría Microsoft agresiva    | No tocar |
 
 ---
 
 ### Compresores
 
-| Programa | Pros                                      | Contras              | Default  |
-|----------|-------------------------------------------|----------------------|----------|
-| 7-Zip    | Gratuito, open source, mejor compresion   | Interfaz anticuada   | Si       |
-| WinRAR   | Formato RAR, muy conocido                 | Propietario (trial)  | Opcional |
-| NanaZip  | Fork moderno de 7-Zip, UI Windows 11      | Mas nuevo            | Opcional |
+| Programa | Pros                                    | Contras              | Default  |
+|----------|-----------------------------------------|----------------------|----------|
+| 7-Zip    | Gratuito, open source, mejor compresión | Interfaz anticuada   | Si       |
+| WinRAR   | Formato RAR, muy conocido               | Propietario (trial)  | Opcional |
+| NanaZip  | Fork moderno de 7-Zip, UI Windows 11    | Mas nuevo            | Opcional |
 
 ---
 
 ### Multimedia
 
-| Programa      | Perfil           | Default  |
-|---------------|------------------|----------|
-| VLC           | Todos            | Si       |
-| Spotify       | Hogar            | Hogar    |
-| OBS Studio    | Developer/Creativo | Opcional |
-| DaVinci Resolve | Creativo       | Opcional |
+| Programa        | Perfil             | Default  |
+|-----------------|--------------------|----------|
+| VLC             | Todos              | Si       |
+| Spotify         | Hogar              | Hogar    |
+| OBS Studio      | Developer/Creativo | Opcional |
+| DaVinci Resolve | Creativo           | Opcional |
 
 ---
 
 ### Productividad
 
-| Programa          | Notas                                   | Default            |
-|-------------------|-----------------------------------------|--------------------|
-| Microsoft 365     | Requiere cuenta activa del cliente      | Si el cliente tiene|
-| Office 2021/2024  | Requiere clave del cliente (ODT)        | Si el cliente tiene|
-| LibreOffice       | Gratuito, para equipos sin licencia     | Hogar sin licencia |
-| Adobe Acrobat Reader | Estandar PDF                         | Si                 |
-| Sumatra PDF       | Liviano, alternativa a Acrobat          | Alternativa        |
+| Programa             | Notas                               | Default             |
+|----------------------|-------------------------------------|---------------------|
+| Microsoft 365        | Requiere cuenta activa del cliente  | Si el cliente tiene |
+| Office 2021/2024     | Requiere clave del cliente (ODT)    | Si el cliente tiene |
+| LibreOffice          | Gratuito, para equipos sin licencia | Hogar sin licencia  |
+| Adobe Acrobat Reader | Estándar PDF                        | Si                  |
+| Sumatra PDF          | Liviano, alternativa a Acrobat      | Alternativa         |
 
 Nota: la toolkit no resuelve licencias. Ofrece los tres caminos de
-instalacion y el cliente activa con sus credenciales. No se incluyen
+instalación y el cliente activa con sus credenciales. No se incluyen
 activaciones KMS ni herramientas de crackeo.
 
 ---
 
-### Comunicacion
+### Comunicación
 
 | Programa         | Perfil              |
 |------------------|---------------------|
@@ -318,23 +318,23 @@ activaciones KMS ni herramientas de crackeo.
 
 ### Developer
 
-| Programa        | Notas                              |
-|-----------------|------------------------------------|
-| Git             | Incluir configuracion inicial      |
-| VSCode          | Extensiones se configuran despues  |
-| Windows Terminal | Ya viene en Win11, instalar Win10 |
-| JDK (Corretto/Temurin) | LTS mas reciente            |
-| Node.js LTS     | Incluir npm                        |
-| Docker Desktop  | Requiere WSL2 habilitado           |
-| Postman         |                                    |
-| Python          | Agregar al PATH automaticamente    |
+| Programa               | Notas                             |
+|------------------------|-----------------------------------|
+| Git                    | Incluir configuración inicial     |
+| VSCode                 | Extensiones se configuran después |
+| Windows Terminal       | Ya viene en Win11, instalar Win10 |
+| JDK (Corretto/Temurin) | LTS mas reciente                  |
+| Node.js LTS            | Incluir npm                       |
+| Docker Desktop         | Requiere WSL2 habilitado          |
+| Postman                |                                   |
+| Python                 | Agregar al PATH automáticamente   |
 
 ---
 
 ## Presets de perfil
 
 Los presets son puntos de partida, no configuraciones fijas.
-El tecnico puede ajustar la seleccion antes de instalar.
+El técnico puede ajustar la selección antes de instalar.
 
 ### Hogar
 ```
@@ -377,17 +377,17 @@ Diseno       : GIMP, Inkscape, DaVinci Resolve
 ## Configuraciones iniciales de Windows
 
 ### Privacidad
-- Deshabilitar telemetria basica
+- Deshabilitar telemetría básica
 - Deshabilitar publicidad personalizada
 - Deshabilitar sugerencias en el menu inicio
 
 ### Energia
-- Plan de energia: Alto rendimiento (desktop) / Balanceado (notebook)
+- Plan de energía: Alto rendimiento (desktop) / Balanceado (notebook)
 - Deshabilitar suspension al cerrar tapa (opcional, preguntar)
 
 ### Sistema
 - Zona horaria correcta
-- Nombre del equipo (preguntar al tecnico)
+- Nombre del equipo (preguntar al técnico)
 - Actualizaciones: verificar y dejar configuradas
 - Mostrar extensiones de archivo
 - Mostrar archivos ocultos (opcional)
@@ -402,21 +402,21 @@ Diseno       : GIMP, Inkscape, DaVinci Resolve
 ### Utils.ps1
 Se copia desde la Portable Windows Toolkit y se mantiene independiente.
 Cada toolkit gestiona su propio Utils.ps1.
-Razon: independencia de ambitos, cada toolkit escala por separado.
+Razón: independencia de ámbitos, cada toolkit escala por separado.
 Nota para el README: aclarar que Utils.ps1 es una copia deliberada
-y que cambios en una toolkit no se propagan automaticamente a la otra.
+y que cambios en una toolkit no se propagan automáticamente a la otra.
 
 ### Funciones nuevas en Utils.ps1 (v1.1.0)
-- Test-InternetConnection : verifica conexion antes de instalar online
+- Test-InternetConnection : verifica conexión antes de instalar online
 - Test-Winget             : verifica disponibilidad de winget
 - Test-DiskSpace          : verifica espacio antes de instalaciones offline
 - Get-WingetPackageStatus : audita el estado de un paquete winget
                             (INSTALLED / OUTDATED / MISSING / UNKNOWN)
 
-### Verificacion de dependencias
+### Verificación de dependencias
 La toolkit verifica antes de ejecutar:
 - Presencia de winget (viene en Windows 10 1809+ y Windows 11)
-- Conexion a internet para instalaciones online
+- Conexión a internet para instalaciones online
 - Espacio disponible en disco para instalaciones offline
 Si algo falla, informa claramente y ofrece alternativa cuando existe.
 Nunca trabaja sobre suposiciones.
@@ -424,11 +424,11 @@ Nunca trabaja sobre suposiciones.
 ### Logs
 Mismo sistema que la Portable Windows Toolkit:
 - Mismo formato de Write-Log con niveles y colores
-- Mismo Initialize-Environment para generacion de archivos con timestamp
+- Mismo Initialize-Environment para generación de archivos con timestamp
 - Mismo Invoke-Pause al finalizar cada modulo
-- Guardados en /logs con prefijo del modulo
+- Guardados en /logs con prefijo del modúlo
 
-### Plantilla de modulo
+### Plantilla de modúlo
 Igual que la Portable Windows Toolkit:
 ```
 SYNOPSIS / DESCRIPTION / NOTES
@@ -444,12 +444,12 @@ RESUMEN
 
 ---
 
-## Planificacion de versiones
+## Planificación de versiones
 
 ### v1.0.0 (en desarrollo)
 - Estructura base del proyecto
 - lib/Utils.ps1 con funciones de auditoria
-- menu.ps1 con navegacion por categorias (auditoria en opcion 1)
+- menu.ps1 con navegación por categorías (auditoria en opción 1)
 - launcher.bat
 - system_audit.ps1 (auditoria global)
 - runtimes.ps1
@@ -457,33 +457,33 @@ RESUMEN
 - compresores.ps1
 - multimedia.ps1
 - productividad.ps1 (con los tres caminos de Office)
-- comunicacion.ps1
+- comunicación.ps1
 - developer.ps1
 - drivers.ps1 (SDIO)
 - configurar.ps1
 - setup_completo.ps1 con presets
 
 ### v1.1.0 (planificada)
-- Preset personalizable y guardable por el tecnico
+- Preset personalizable y guardable por el técnico
 - Log de setup exportable como resumen para el cliente
 - Soporte para agregar software custom a los presets
-- Verificacion de versiones instaladas antes de reinstalar
+- Verificación de versiones instaladas antes de reinstalar
 
 ### v2.0.0 (futuro)
 - Estados CORRUPTED y REPAIRABLE
-- A evaluar segun necesidades que surjan en v1.x
+- A evaluar según necesidades que surjan en v1.x
 
 ---
 
-## Notas de integracion futura
+## Notas de integración futura
 
-Las tres toolkits del ecosistema son ambitos separados e independientes.
-Cada una escala por su cuenta. La integracion futura en una aplicacion
+Las tres toolkits del ecosistema son ámbitos separados e independientes.
+Cada una escala por su cuenta. La integración futura en una aplicación
 Python unificada es una decision de largo plazo que no condiciona el
 desarrollo actual de ninguna de las tres.
 
 Lo que conviene mantener consistente entre toolkits para facilitar
-esa futura integracion:
+esa futura integración:
 - Mismo formato de logs
 - Misma plantilla de modulo
 - Mismo sistema de niveles (INFO, SUCCESS, WARNING, ERROR)
