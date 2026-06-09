@@ -8,7 +8,7 @@
     Debe importarse via dot-sourcing al inicio de cada script:
         . "$PSScriptRoot\..\lib\Utils.ps1"
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 
     NOTA: Este archivo es una copia deliberada e independiente del Utils.ps1
@@ -51,8 +51,9 @@ function Write-Log {
         ERROR   = "Red"
     }
 
-    $timestamp = Get-Date -Format "HH:mm:ss"
-    $line      = "[{0}] [{1}] {2}" -f $timestamp, $Level, $Message
+    $timestamp = Get-Date -Format " HH:mm "
+    $tag  = Get-CenteredTag -Text $Level -TotalWidth 9
+    $line = "[{0}] {1} {2}" -f $timestamp, $tag, $Message
     $color     = $colorMap[$Level]
 
     Write-Host $line -ForegroundColor $color
@@ -251,6 +252,58 @@ function Invoke-Pause {
         Write-Log "Sin conexion a internet." -Level ERROR
     }
 #>
+
+<#
+.SYNOPSIS
+    Genera un texto centrado entre delimitadores con relleno de espacios.
+.DESCRIPTION
+    Distribuye espacios equitativamente a ambos lados del texto para
+    mantener alineacion visual uniforme en consola y archivos de log.
+    Si el texto supera el ancho solicitado, retorna sin romper el contenido.
+.PARAMETER Text
+    Texto a centrar dentro de los delimitadores.
+.PARAMETER TotalWidth
+    Ancho total del contenido interior (sin contar los delimitadores).
+    Si se omite, se ajusta automaticamente al texto mas 2 espacios de aire.
+.PARAMETER OpenDelimiter
+    Caracter de apertura. Por defecto: "["
+.PARAMETER CloseDelimiter
+    Caracter de cierre. Por defecto: "]"
+.OUTPUTS
+    [string] Texto encofrado y centrado.
+.EXAMPLE
+    Get-CenteredTag "INFO"       # "[INFO]"     (modo automatico)
+    Get-CenteredTag "OK" 9       # "[   OK   ]" (modo ancho fijo)
+    Get-CenteredTag "WARN" 9     # "[  WARN  ]"
+#>
+function Get-CenteredTag {
+    param (
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Text,
+
+        [Parameter(Position = 1)]
+        [int]$TotalWidth,
+
+        [string]$OpenDelimiter  = "[",
+        [string]$CloseDelimiter = "]"
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('TotalWidth')) {
+        $TotalWidth = $Text.Length + 2
+    }
+
+    $SpacesNeeded = $TotalWidth - $Text.Length
+
+    if ($SpacesNeeded -le 0) {
+        return "$OpenDelimiter$Text$CloseDelimiter"
+    }
+
+    $PadLeft  = [Math]::Floor($SpacesNeeded / 2)
+    $PadRight = [Math]::Ceiling($SpacesNeeded / 2)
+
+    return "{0}{1}{2}{3}{4}" -f $OpenDelimiter, (" " * $PadLeft), $Text, (" " * $PadRight), $CloseDelimiter
+}
+
 function Test-InternetConnection {
     try {
         $null = [System.Net.Dns]::GetHostEntry("dns.google")
@@ -304,8 +357,6 @@ function Test-DiskSpace {
     return $freeGB -ge $MinimumGB
 }
 
-#endregion
-
 <#
 .SYNOPSIS
     Determina el estado de instalacion de un paquete winget.
@@ -354,3 +405,5 @@ function Get-WingetPackageStatus {
 
     return "INSTALLED"
 }
+
+#endregion
