@@ -244,17 +244,6 @@ function Invoke-Pause {
 
 <#
 .SYNOPSIS
-    Verifica si hay conexion a internet intentando resolver un host conocido.
-.OUTPUTS
-    [bool]
-.EXAMPLE
-    if (-not (Test-InternetConnection)) {
-        Write-Log "Sin conexion a internet." -Level ERROR
-    }
-#>
-
-<#
-.SYNOPSIS
     Genera un texto centrado entre delimitadores con relleno de espacios.
 .DESCRIPTION
     Distribuye espacios equitativamente a ambos lados del texto para
@@ -304,6 +293,17 @@ function Get-CenteredTag {
     return "{0}{1}{2}{3}{4}" -f $OpenDelimiter, (" " * $PadLeft), $Text, (" " * $PadRight), $CloseDelimiter
 }
 
+
+<#
+.SYNOPSIS
+    Verifica si hay conexion a internet intentando resolver un host conocido.
+.OUTPUTS
+    [bool]
+.EXAMPLE
+    if (-not (Test-InternetConnection)) {
+        Write-Log "Sin conexion a internet." -Level ERROR
+    }
+#>
 function Test-InternetConnection {
     try {
         $null = [System.Net.Dns]::GetHostEntry("dns.google")
