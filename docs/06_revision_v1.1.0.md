@@ -44,6 +44,10 @@ para consumir esa función en lugar de manejar el retorno directamente.
 de reporte final en todos los módulos, más la creación de la función
 centralizada en un nuevo modúlo.
 
+**Nota:** runtimes.ps1 ya implementa un tercer estado `OMITIDO` en su reporte,
+lo que refuerza la necesidad de estandarizar el manejo de estados en todos
+los módulos como parte de la solución en v2.0.0.
+
 **Destino:** v2.0.0 
 
 ---
@@ -57,7 +61,7 @@ centralizada en un nuevo modúlo.
 | compresores.ps1    | ✓                   |
 | multimedia.ps1     | ✓                   |
 | productividad.ps1  | ✓                   |
+| runtimes.ps1       | ✓                   |
 | comunicacion.ps1   | pendiente           |
-| runtimes.ps1       | pendiente           |
 | system_audit.ps1   | pendiente           |
 | setup_completo.ps1 | pendiente           |
