@@ -50,6 +50,28 @@ los módulos como parte de la solución en v2.0.0.
 
 **Destino:** v2.0.0 
 
+### 2. FiltroWinget y modo automático en módulos
+
+**Detectado en:** setup_completo.ps1
+
+**Problema:**
+La estructura FiltroWinget está definida en cada preset, pero nunca se usa.
+Para que funcione correctamente, cada modúlo necesita poder ejecutarse en
+modo automático sin submenu interactivo cuando es llamado desde setup_completo,
+instalando solo las apps del filtro del preset que estén MISSING / OUTDATED.
+
+Implementarlo implica agregar un parámetro -FiltroWinget y un modo automático
+a cada modúlo individual, lo cual excede el scope de v1.1.0.
+
+**Solución propuesta:**
+Agregar parámetro -FiltroWinget y -ModoAutomatico a cada modúlo.
+En modo automático el modúlo saltea el submenu, instala solo las apps
+del filtro y genera su reporte normalmente.
+
+**Impacto estimado:** alto — afecta todos los módulos individuales
+más setup_completo.ps1.
+
+**Destino:** v2.0.0.
 ---
 
 ## Módulos revisados
@@ -62,6 +84,6 @@ los módulos como parte de la solución en v2.0.0.
 | multimedia.ps1     | ✓                   |
 | productividad.ps1  | ✓                   |
 | runtimes.ps1       | ✓                   |
-| comunicacion.ps1   | pendiente           |
-| system_audit.ps1   | pendiente           |
-| setup_completo.ps1 | pendiente           |
+| comunicacion.ps1   | ✓                   |
+| system_audit.ps1   | ✓                   |
+| setup_completo.ps1 | ✓                   |
