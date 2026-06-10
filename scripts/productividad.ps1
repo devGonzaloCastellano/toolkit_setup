@@ -18,7 +18,7 @@
 
     Genera un reporte con el estado previo y final de cada componente.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 #>
 
@@ -206,12 +206,9 @@ function Invoke-AuditoriaCategoria {
             "UNKNOWN"   { "{0} (UNKNOWN)"           -f $app.Nombre }
         }
 
-        switch ($app.Estado) {
-            "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-            "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-            "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-            "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-        }
+        $tag   = Get-CenteredTag -Text $app.Estado -TotalWidth 11
+        $level = if ($app.Estado -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+        Write-Log "$tag $label" -Level $level -LogFile $LogFile
     }
 
     Write-Blank -LogFile $LogFile
@@ -226,26 +223,30 @@ function Show-CategoriaSubmenu {
     )
 
     Write-Host "   -- $Titulo --" -ForegroundColor DarkCyan
+    $tagOK = Get-CenteredTag -Text "OK" -TotalWidth 2
 
     foreach ($app in $Catalogo) {
         $nota = if ($app.Nota -ne "") { " ($($app.Nota))" } else { "" }
 
         switch ($app.Estado) {
             "INSTALLED" {
-                Write-Host ("   [OK] {0,-22} INSTALLED - {1}" -f $app.Nombre, $app.Version) -ForegroundColor Green
+                Write-Host ("   $tagOK {0,-22} INSTALLED - {1}" -f $app.Nombre, $app.Version) -ForegroundColor Green
             }
             "OUTDATED" {
-                Write-Host ("   [{0,2}] {1,-22} OUTDATED  - {2}{3}" -f $Contador.Value, $app.Nombre, $app.Version, $nota) -ForegroundColor Yellow
+                $tag = Get-CenteredTag -Text "$($Contador.Value)" -TotalWidth 2
+                Write-Host ("   $tag {0,-22} OUTDATED  - {1}{2}" -f $app.Nombre, $app.Version, $nota) -ForegroundColor Yellow
                 $Opciones[$Contador.Value.ToString()] = $app
                 $Contador.Value++
             }
             "MISSING" {
-                Write-Host ("   [{0,2}] {1,-22} MISSING{2}" -f $Contador.Value, $app.Nombre, $nota) -ForegroundColor Gray
+                $tag = Get-CenteredTag -Text "$($Contador.Value)" -TotalWidth 2
+                Write-Host ("   $tag {0,-22} MISSING{1}" -f $app.Nombre, $nota) -ForegroundColor Gray
                 $Opciones[$Contador.Value.ToString()] = $app
                 $Contador.Value++
             }
             "UNKNOWN" {
-                Write-Host ("   [{0,2}] {1,-22} UNKNOWN{2}" -f $Contador.Value, $app.Nombre, $nota) -ForegroundColor DarkYellow
+                $tag = Get-CenteredTag -Text "$($Contador.Value)" -TotalWidth 2
+                Write-Host ("   $tag {0,-22} UNKNOWN{1}" -f $app.Nombre, $nota) -ForegroundColor DarkYellow
                 $Opciones[$Contador.Value.ToString()] = $app
                 $Contador.Value++
             }
@@ -450,12 +451,9 @@ foreach ($app in ($catalogoOffice + $catalogoPDF + $catalogoUtilidades)) {
         "UNKNOWN"   { "{0} (UNKNOWN)"           -f $app.Nombre }
     }
 
-    switch ($estadoFinal) {
-        "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-        "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-        "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-        "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-    }
+    $tag   = Get-CenteredTag -Text $estadoFinal -TotalWidth 11
+    $level = if ($estadoFinal -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+    Write-Log "$tag $label" -Level $level -LogFile $LogFile
 }
 
 Write-Blank -LogFile $LogFile
@@ -468,7 +466,8 @@ if ($acciones.Count -eq 0) {
     Write-Log "No se realizaron cambios." -LogFile $LogFile
 } else {
     foreach ($r in $acciones) {
-        $linea = "  [{0,-8}] {1} (era: {2})" -f $r.Final, $r.Nombre, $r.Previo
+        $tag   = Get-CenteredTag -Text $r.Final -TotalWidth 7
+        $linea = "  $tag $($r.Nombre) (era: $($r.Previo))"
         switch ($r.Final) {
             "OK"    { Write-Log $linea -Level SUCCESS -LogFile $LogFile }
             "ERROR" { Write-Log $linea -Level ERROR   -LogFile $LogFile }
