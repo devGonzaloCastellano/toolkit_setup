@@ -98,12 +98,9 @@ foreach ($runtime in $runtimes) {
     $estado = Get-WingetPackageStatus -PackageId $runtime.Id
     $runtime | Add-Member -NotePropertyName Estado -NotePropertyValue $estado
 
-    switch ($estado) {
-        "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-        "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-        "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-        "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-    }
+    $tag   = Get-CenteredTag -Text $estado -TotalWidth 11
+    $level = if ($estado -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+    Write-Log "$tag $label" -Level $level -LogFile $LogFile
 }
 
 Write-Blank -LogFile $LogFile
@@ -120,11 +117,9 @@ if ($feature) {
 }
 
 $label = "{0} ({1})" -f $netfx35.Nombre, $netfx35.Nivel
-switch ($netfx35.Estado) {
-    "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-    "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-    "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-}
+$tag   = Get-CenteredTag -Text $netfx35.Estado -TotalWidth 11
+$level = if ($netfx35.Estado -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+Write-Log "$tag $label" -Level $level -LogFile $LogFile
 
 Write-Blank -LogFile $LogFile
 
@@ -224,7 +219,8 @@ $errores  = $resultados | Where-Object { $_.Final -eq "ERROR" }
 $omitidos = $resultados | Where-Object { $_.Final -eq "OMITIDO" }
 
 foreach ($r in $resultados) {
-    $linea = "  [{0,-8}] {1}" -f $r.Final, $r.Nombre
+    $tag   = Get-CenteredTag -Text $r.Final -TotalWidth 7
+    $linea = "  $tag $($r.Nombre)"
     switch ($r.Final) {
         "OK"      { Write-Log $linea -Level SUCCESS -LogFile $LogFile }
         "ERROR"   { Write-Log $linea -Level ERROR   -LogFile $LogFile }
