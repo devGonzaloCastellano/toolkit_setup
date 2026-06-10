@@ -266,7 +266,8 @@ do {
     Write-Blank -LogFile $LogFile
 
     foreach ($r in $resultados) {
-        $linea = "  [{0,-5}] {1}" -f $r.Estado, $r.Modulo
+        $tag   = Get-CenteredTag -Text $r.Estado -TotalWidth 5
+        $linea = "  $tag $($r.Modulo)"
         switch ($r.Estado) {
             "OK"    { Write-Log $linea -Level SUCCESS -LogFile $LogFile }
             "ERROR" { Write-Log $linea -Level ERROR   -LogFile $LogFile }
