@@ -7,7 +7,7 @@
     Permite instalar multiples aplicaciones en secuencia antes de finalizar.
     Genera un reporte con el estado previo y final de cada componente.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 #>
 
@@ -131,12 +131,9 @@ function Invoke-Auditoria {
             "UNKNOWN"   { "{0} (UNKNOWN)"           -f $app.Nombre }
         }
 
-        switch ($app.Estado) {
-            "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-            "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-            "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-            "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-        }
+        $tag   = Get-CenteredTag -Text $app.Estado -TotalWidth 11
+        $level = if ($app.Estado -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+        Write-Log "$tag $label" -Level $level -LogFile $LogFile
     }
 
     Write-Blank -LogFile $LogFile
@@ -152,24 +149,28 @@ function Show-Submenu {
 
     $opciones = @{}
     $contador = 1
+    $tagOK = Get-CenteredTag -Text "OK" -TotalWidth 2
 
     foreach ($app in $comunicacion) {
         switch ($app.Estado) {
             "INSTALLED" {
-                Write-Host ("   [OK] {0,-12} INSTALLED - {1,-8} ({2})" -f $app.Nombre, $app.Version, $app.Perfil) -ForegroundColor Green
+                Write-Host ("   $tagOK {0,-12} INSTALLED - {1,-8} ({2})" -f $app.Nombre, $app.Version, $app.Perfil) -ForegroundColor Green
             }
             "OUTDATED" {
-                Write-Host ("   [{0}] {1,-12} OUTDATED  - {2,-8} ({3})" -f $contador, $app.Nombre, $app.Version, $app.Perfil) -ForegroundColor Yellow
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-12} OUTDATED  - {1,-8} ({2})" -f $app.Nombre, $app.Version, $app.Perfil) -ForegroundColor Yellow
                 $opciones[$contador.ToString()] = $app
                 $contador++
             }
             "MISSING" {
-                Write-Host ("   [{0}] {1,-12} MISSING            ({2})" -f $contador, $app.Nombre, $app.Perfil) -ForegroundColor Gray
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-12} MISSING            ({1})" -f $app.Nombre, $app.Perfil) -ForegroundColor Gray
                 $opciones[$contador.ToString()] = $app
                 $contador++
             }
             "UNKNOWN" {
-                Write-Host ("   [{0}] {1,-12} UNKNOWN            ({2})" -f $contador, $app.Nombre, $app.Perfil) -ForegroundColor DarkYellow
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-12} UNKNOWN            ({1})" -f $app.Nombre, $app.Perfil) -ForegroundColor DarkYellow
                 $opciones[$contador.ToString()] = $app
                 $contador++
             }
@@ -196,7 +197,28 @@ function Invoke-InstalarApp {
         }
     }
 
-    $accion = if ($App.Estado -eq "OUTDATED") { "upgrade" } else { "install" }
+    $forzarReinstalar = $false
+    if ($idEfectivo -eq $App.IdAlt -and $App.Estado -eq "OUTDATED") {
+        Write-Blank -LogFile $LogFile
+        Write-Log "$($App.Nombre) fue detectado fuera del registro de winget." -Level WARNING -LogFile $LogFile
+        Write-Host ""
+        Write-Host "   [1] Actualizar version existente (conserva perfil del usuario)" -ForegroundColor Cyan
+        Write-Host "   [2] Reinstalar limpiamente via winget (puede afectar el perfil)" -ForegroundColor Yellow
+        Write-Host "   [0] Cancelar" -ForegroundColor DarkGray
+        Write-Host ""
+        $opcion = Read-Host "   Elegir opcion"
+
+        switch ($opcion) {
+            "1" { $forzarReinstalar = $false }
+            "2" { $forzarReinstalar = $true  }
+            default {
+                Write-Log "Operacion cancelada: $($App.Nombre)" -Level WARNING -LogFile $LogFile
+                return $false
+            }
+        }
+    }
+
+    $accion = if ($App.Estado -eq "OUTDATED" -and -not $forzarReinstalar) { "upgrade" } else { "install" }
     $verbo  = if ($accion -eq "upgrade") { "Actualizando" } else { "Instalando" }
 
     Write-Blank -LogFile $LogFile
@@ -313,12 +335,9 @@ foreach ($app in $comunicacion) {
         "UNKNOWN"   { "{0} (UNKNOWN)"           -f $app.Nombre }
     }
 
-    switch ($estadoFinal) {
-        "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-        "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-        "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-        "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-    }
+    $tag   = Get-CenteredTag -Text $estadoFinal -TotalWidth 11
+    $level = if ($estadoFinal -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+    Write-Log "$tag $label" -Level $level -LogFile $LogFile
 }
 
 Write-Blank -LogFile $LogFile
@@ -331,7 +350,8 @@ if ($acciones.Count -eq 0) {
     Write-Log "No se realizaron cambios." -LogFile $LogFile
 } else {
     foreach ($r in $acciones) {
-        $linea = "  [{0,-8}] {1} (era: {2})" -f $r.Final, $r.Nombre, $r.Previo
+        $tag   = Get-CenteredTag -Text $r.Final -TotalWidth 7
+        $linea = "  $tag $($r.Nombre) (era: $($r.Previo))"
         switch ($r.Final) {
             "OK"    { Write-Log $linea -Level SUCCESS -LogFile $LogFile }
             "ERROR" { Write-Log $linea -Level ERROR   -LogFile $LogFile }
