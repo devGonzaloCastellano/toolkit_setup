@@ -22,7 +22,7 @@
 
     No realiza cambios en el sistema.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 #>
 
@@ -150,14 +150,9 @@ function Write-EstadoApp {
         [string]$Estado
     )
 
-    $label = "  [{0,-9}] {1}" -f $Estado, $Nombre
-
-    switch ($Estado) {
-        "INSTALLED" { Write-Log $label -Level SUCCESS -LogFile $LogFile }
-        "OUTDATED"  { Write-Log $label -Level WARNING -LogFile $LogFile }
-        "MISSING"   { Write-Log $label -Level WARNING -LogFile $LogFile }
-        "UNKNOWN"   { Write-Log $label -Level WARNING -LogFile $LogFile }
-    }
+    $tag   = Get-CenteredTag -Text $Estado -TotalWidth 11
+    $level = if ($Estado -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+    Write-Log "  $tag $Nombre" -Level $level -LogFile $LogFile
 }
 
 function Invoke-AuditoriaCategoria {
