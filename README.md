@@ -9,7 +9,7 @@ software preexistente. Su funcion principal es auditar el estado del sistema,
 determinar que falta o esta desactualizado, y ejecutar las acciones necesarias
 con evidencia registrada.
 
-Actualmente el sistema se encuentra en su Version 1 (v1.0.0).
+Actualmente, el sistema se encuentra en su Version 1 (v1.0.0).
 
 ---
 
@@ -126,10 +126,12 @@ windows-setup-toolkit/
 |   |-- office/
 |   `-- drivers/
 |-- docs/
-|   |-- 01_setup_toolkit_plan_v1.0.0.md
-|   |-- 02_revision_v1.md
-|   |-- 03_setup_toolkit_plan_v1.1.0.md
-|   `-- 04_review_v1.0.0.md
+|   |-- 01_planificacion_v1.0.0.md
+|   |-- 02_revision_v1.0.0.md
+|   |-- 03_rediseño_v1.0.0.md
+|   |-- 04_cierre_v1.0.0.md
+|   |-- 03_planificacion_v1.1.0.md
+|   `-- 04_revision_v1.1.0.md
 `-- logs/
 ```
 
@@ -144,7 +146,7 @@ Modulo compartido importado via dot-sourcing por todos los scripts.
 Provee: `Write-Log`, `Write-Blank`, `Write-Section`, `Initialize-Environment`,
 `Test-IsAdmin`, `Invoke-Elevate`, `Format-Bytes`, `Invoke-Pause`,
 `Test-InternetConnection`, `Test-Winget`, `Test-DiskSpace`,
-`Get-WingetPackageStatus`.
+`Get-WingetPackageStatus`, `Get-CenteredTag`.
 
 > Utils.ps1 es una copia deliberada e independiente del Utils.ps1 de la
 > Portable Windows Toolkit. Cada toolkit gestiona su propio modúlo.
@@ -180,7 +182,7 @@ RESUMEN
 
 ---
 
-## Seguridad y elevacion de privilegios
+## Seguridad y elevación de privilegios
 
 El toolkit cuenta con un sistema de auto-elevación de privilegios.
 Al ejecutarse, el script verifica si cuenta con permisos de administrador.
@@ -277,18 +279,21 @@ integración futura en una aplicación unificada.
 - configurar.ps1: configuraciones iniciales de Windows
 - setup_completo.ps1: presets Hogar, Oficina, Creativo
 
-### Version 1.1.0 (Planificada)
-- Refactorización de código duplicado hacia Utils.ps1
-- Formato uniforme de etiquetas en logs con ancho fijo
-- Opción de reinstalar Chrome/Zoom limpiamente via winget
-- FiltroWinget activo en presets de setup_completo
-- Preset personalizable y guardable por el técnico
-- Log exportable como resumen para el cliente
-- Validación completa en VMs con Windows 10 y Windows 11
+### Version 1.1.0 (Actual)
+- Get-CenteredTag en Utils.ps1 para formato uniforme de etiquetas
+- Formato uniforme de niveles de log con ancho fijo (TotalWidth 9)
+- Formato uniforme de estados de auditoria con ancho fijo (TotalWidth 11)
+- Prompt para Chrome y Zoom detectados fuera de winget: actualizar o reinstalar via winget
+- Validación en VMs limpias con Windows 10 y Windows 11 (pendiente)
 
-### Version 2.0.0 (Futuro)
-- Estados CORRUPTED y REPAIRABLE
-- A evaluar según necesidades que surjan en v1.x
+### Version 2.0.0 (Planificada)
+- Nuevo modúlo lib/ dedicado a gestión de paquetes winget
+- Migración de funciones duplicadas (Get-VersionInstalada, Invoke-Instalar*)
+- Modo automático en módulos para ejecución desde setup_completo
+- FiltroWinget activo en presets de setup_completo
+- Nuevo modúlo lib/ReportUtils.ps1 para generación de reportes
+- Reporte exportable con delta de estados (antes/después) por sesión
+- Compatibilidad con flujo por módulos sueltos y setup_completo
 
 ---
 
