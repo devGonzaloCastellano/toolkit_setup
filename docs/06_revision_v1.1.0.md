@@ -55,8 +55,8 @@ centralizada en un nuevo modúlo.
 | Utils.ps1          | ✓                   |
 | navegadores.ps1    | ✓                   |
 | compresores.ps1    | ✓                   |
-| multimedia.ps1     | pendiente           |
-| productividad.ps1  | pendiente           |
+| multimedia.ps1     | ✓                   |
+| productividad.ps1  | ✓                   |
 | comunicacion.ps1   | pendiente           |
 | runtimes.ps1       | pendiente           |
 | system_audit.ps1   | pendiente           |
