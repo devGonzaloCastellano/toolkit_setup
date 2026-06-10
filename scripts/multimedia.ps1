@@ -7,7 +7,7 @@
     Permite instalar multiples aplicaciones en secuencia antes de finalizar.
     Genera un reporte con el estado previo y final de cada componente.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 #>
 
@@ -118,12 +118,9 @@ function Invoke-Auditoria {
             "UNKNOWN"   { "{0} (UNKNOWN)"           -f $app.Nombre }
         }
 
-        switch ($app.Estado) {
-            "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-            "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-            "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-            "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-        }
+        $tag   = Get-CenteredTag -Text $app.Estado -TotalWidth 11
+        $level = if ($app.Estado -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+        Write-Log "$tag $label" -Level $level -LogFile $LogFile
     }
 
     Write-Blank -LogFile $LogFile
@@ -139,24 +136,28 @@ function Show-Submenu {
 
     $opciones = @{}
     $contador = 1
+    $tagOK = Get-CenteredTag -Text "OK" -TotalWidth 2
 
     foreach ($app in $multimedia) {
         switch ($app.Estado) {
             "INSTALLED" {
-                Write-Host ("   [OK] {0,-12} INSTALLED - {1}" -f $app.Nombre, $app.Version) -ForegroundColor Green
+                Write-Host ("   $tagOK {0,-12} INSTALLED - {1}" -f $app.Nombre, $app.Version) -ForegroundColor Green
             }
             "OUTDATED" {
-                Write-Host ("   [{0}] {1,-12} OUTDATED  - {2}" -f $contador, $app.Nombre, $app.Version) -ForegroundColor Yellow
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-12} OUTDATED  - {1}" -f $app.Nombre, $app.Version) -ForegroundColor Yellow
                 $opciones[$contador.ToString()] = $app
                 $contador++
             }
             "MISSING" {
-                Write-Host ("   [{0}] {1,-12} MISSING" -f $contador, $app.Nombre) -ForegroundColor Gray
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-12} MISSING" -f $app.Nombre) -ForegroundColor Gray
                 $opciones[$contador.ToString()] = $app
                 $contador++
             }
             "UNKNOWN" {
-                Write-Host ("   [{0}] {1,-12} UNKNOWN" -f $contador, $app.Nombre) -ForegroundColor DarkYellow
+                $tag = Get-CenteredTag -Text "$contador" -TotalWidth 2
+                Write-Host ("   $tag {0,-12} UNKNOWN" -f $app.Nombre) -ForegroundColor DarkYellow
                 $opciones[$contador.ToString()] = $app
                 $contador++
             }
@@ -282,12 +283,9 @@ foreach ($app in $multimedia) {
         "UNKNOWN"   { "{0} (UNKNOWN)"           -f $app.Nombre }
     }
 
-    switch ($estadoFinal) {
-        "INSTALLED" { Write-Log "[INSTALLED] $label" -Level SUCCESS -LogFile $LogFile }
-        "OUTDATED"  { Write-Log "[OUTDATED]  $label" -Level WARNING -LogFile $LogFile }
-        "MISSING"   { Write-Log "[MISSING]   $label" -Level WARNING -LogFile $LogFile }
-        "UNKNOWN"   { Write-Log "[UNKNOWN]   $label" -Level WARNING -LogFile $LogFile }
-    }
+    $tag   = Get-CenteredTag -Text $estadoFinal -TotalWidth 11
+    $level = if ($estadoFinal -eq "INSTALLED") { "SUCCESS" } else { "WARNING" }
+    Write-Log "$tag $label" -Level $level -LogFile $LogFile
 }
 
 Write-Blank -LogFile $LogFile
@@ -300,7 +298,8 @@ if ($acciones.Count -eq 0) {
     Write-Log "No se realizaron cambios." -LogFile $LogFile
 } else {
     foreach ($r in $acciones) {
-        $linea = "  [{0,-8}] {1} (era: {2})" -f $r.Final, $r.Nombre, $r.Previo
+        $tag   = Get-CenteredTag -Text $r.Final -TotalWidth 7
+        $linea = "  $tag $($r.Nombre) (era: $($r.Previo))"
         switch ($r.Final) {
             "OK"    { Write-Log $linea -Level SUCCESS -LogFile $LogFile }
             "ERROR" { Write-Log $linea -Level ERROR   -LogFile $LogFile }
