@@ -8,7 +8,7 @@
     La opcion [A] aplica todas las recomendadas de una sola vez.
     Genera un reporte con todas las acciones realizadas.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 
     Algunas configuraciones requieren reinicio para tomar efecto:

@@ -9,7 +9,7 @@
       UNKNOWN   -> intenta instalar con advertencia
     Al finalizar genera un mini reporte con el estado de cada componente.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 #>
 

@@ -17,7 +17,7 @@
     NOTA: Este modulo llama a los modulos individuales en secuencia.
     Cada modulo realiza su propia auditoria antes de instalar.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 #>
 

@@ -8,7 +8,7 @@
     donde descargarlo manualmente.
     Genera un log con el resultado de la sesion.
 .NOTES
-    Version : 1.0.0
+    Version : 1.1.0
     Proyecto: Windows Setup Toolkit
 
     SDIO (Snappy Driver Installer Origin)
